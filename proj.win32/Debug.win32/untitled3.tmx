@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" nextobjectid="2">
+ <tileset firstgid="1" name="tmw_desert_spacing" tilewidth="32" tileheight="32" spacing="1" margin="1" tilecount="48" columns="8">
+  <image source="../../../Downloads/2016 가을/개발 경험 프로젝트/Background_prototype/Resources/tmw_desert_spacing.png" width="265" height="199"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt1rENwzAMBEBNkggeIPuPl8YCCEGKJfH5JIEUhAsX/PMX5lVKeSWeej+vbrxznTraZLT0ht7inU/rkB7vjAhHlm5WHJG7qZuGqN2cGKJ5tIbe83fEMEgL22PhYHdjaWBZGAZLSyUbLCwe+dEWrx6QDu/8WkuEDjSOWjCGt5MFld/a8cuCyu5lQX5/tqNZLPOzHNY9MCwyP+umRFpmHTAsCMcsv5Vltk9jWTEgLU+7Ti2rBmk59azu2rHs9ICw7O5asWgMvcdy15MFYVjpBbHH+j/ZW6RJ00EEC7JrD0cbC4O0MDyWBlY3LIOlhW2QFpTHy4Cy1ACG3rJripJ/xZXVMPJkNow8NbFBWrIbWg+se6DNB2wYdcO+17QdzN5nsDwZRh6t6wuotSaw
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" name="Start" x="124" y="1488" width="72" height="68"/>
+ </objectgroup>
+</map>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" nextobjectid="2">
+ <tileset firstgid="1" name="tmw_desert_spacing" tilewidth="32" tileheight="32" spacing="1" margin="1" tilecount="48" columns="8">
+  <image source="../../../Downloads/2016 가을/개발 경험 프로젝트/Background_prototype/Resources/tmw_desert_spacing.png" width="265" height="199"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="100" height="100">
+  <data encoding="base64" compression="zlib">
+   eJztmkFuwzAQA/2S5v+/7KlAESitZO8uZyUeeAoSkZzItiy9rut6DfRlDbXaUVSfZjPuRPFdsxnnV7GcZbMzo+h8lT3txCUzS3VHnedMhW9lL124VPok9EGdMwpP1A7UjFRj03gQulFfw9V9k7iYBYeLug/1+CQuhC4IHghcCD0QPGRxWcmm7oH4nK/MqXquPoXDUy4VXk7jMFpT/iXKf2I3/Zf70+c7va+lKOIeHjVnTr0u/c4e/b3ZTinv2wiKyD7b+R1Wpymyj5V5oM5NVHQv711/ugaZST6Lv/qv9NBVVWsGgo8OqtzLXr3XnybifvbJTKh72qcyofLowCT6PV6HvW0Kkzt9r7JRZ+3kM/sdnDpjFx7ZazNCxjseFM+BlXs5BB5kJsR1AM1H5bqV3APJR7ZvVS/mMf5t8+B43+05rjMPdR/q8Z/6yNg/69gDxUfktZ7QxQ4ezIPlIWqO7NBFxPiULtVdEDxUni2id6H2EL3uMg/W2ObxbFxCfkIXah9EFqfzUGcmeyOdg1OL4K9yP1KdldCF2kcXFiQm2TzU+Vb9qj1nnmdR90vpQ+mhMwsKk+yzdx3VcS99NwakjDNjvq495wKRy3vXI6k7IWimk5kuZ7p258/5kPYRuozZSSom5mImXdTtufsE+V7Cknnw5P1DlsyDJ+/p8lS1r6vO2UnZfdF40PxUeiRmJ3oyD75oZ2+75Mz2GuWX+m6mE48oz8rMO/L48X3Hu3q9MTN+VyZ3vBOy7sxjxT8l5+wZDrXPzIyUfCs+KJ6fZB1lUN8z7npQe87IrmbxdPxdmKhYZJzB6X4W7d179vm6yr46MZntJeIcn/I/22G+0P1VsCHkp/igSDV/zUHPiDQvu6vjfdOyLMuyLMuyLGsXfQML2JY3
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="1" name="Start" gid="31" x="264" y="3016" width="32" height="32"/>
+ </objectgroup>
+</map>
