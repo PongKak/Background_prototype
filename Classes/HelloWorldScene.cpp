@@ -37,16 +37,17 @@ bool HelloWorld::init()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 
-	map = TMXTiledMap::create("untitled.tmx");
+	map = CCTMXTiledMap::create("untitled.tmx");
+	background = map->layerNamed("Tile Layer 1");
 	CCTMXObjectGroup* objectGroup = map->getObjectGroup("Object Layer 1");
+	//metaInfo = map->layerNamed("MetaInfo");
+//	metaInfo->setVisible(false);
 	
-	
-
-
 	map->setTag(2);
 	mapSize = map->getMapSize();
 	tileSize = map->getContentSize();
 	this->addChild(map);
+
 
 	
 
@@ -54,9 +55,41 @@ bool HelloWorld::init()
 	
 
 	float x = objectStart["x"].asFloat();
-	float y = objectStart["y"].asFloat();
+	float y = objectStart["y"].asFloat() +4;
+
+	char pointX[]  = "X:";
+	char pointY[] = "Y:";
+	CCLabelTTF* xLabel = CCLabelTTF::create(pointX, "Thonburi", 32);
+
+	xLabel->setPosition(100, 150);
+	xLabel->setColor(ccc3(0, 0, 0));
+	xLabel->setOpacity(100.0);
+	this->addChild(xLabel);
+
+	xNowLabel->setPosition(200, 150);
+	xNowLabel->setColor(ccc3(0, 0, 0));
+	xNowLabel->setOpacity(100.0);
+	this->addChild(xNowLabel);
+
+
+	CCLabelTTF* yLabel = CCLabelTTF::create(pointY, "Thonburi", 32);
+	yLabel->setPosition(100, 100);
+	yLabel->setColor(ccc3(0, 0, 0));
+	yLabel->setOpacity(100.0);
+	this->addChild(yLabel);
+	
+
+	yNowLabel->setPosition(200, 100);
+	yNowLabel->setColor(ccc3(0, 0, 0));
+	yNowLabel->setOpacity(100.0);
+	this->addChild(yNowLabel);
+
+
+
 
 	Sprite* sprite = Sprite::create("Pea.png");
+
+
 
 	sprite->setPosition(x, y);
 	sprite->setTag(0);
@@ -130,41 +163,53 @@ void HelloWorld::update(float fDelta)
 	Node* pea = this->getChildByTag(0);
 	Sprite* sprite = (Sprite*)this->getChildByTag(1);
 	Vec2 position = pea->getPosition();
-	map = (TMXTiledMap*)this->getChildByTag(2);
+	bool movable = true;
 
-	float peaX, peaY;
-	peaX = pea->getPosition().x;
-	peaY = pea->getPosition().y;
+	std::string xPosition = "";
+	std::string yPosition = "";
+	char buffer[100];
 
-	float backX, backY;
-	backX = backgroundX;
-	backY = backgroundY;
+	float peaX = pea->getPosition().x;
+	float peaY = pea->getPosition().y;
 
-	wall = map->layerNamed("Wall");
 
-	int tileGid;
-
-	CCPoint tileCoord;
 	
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	pea->setPosition(Vec2(peaX, peaY));
 
 
 
+	xPosition += itoa((int)(-backgroundX + pea->getPositionX()), buffer, 10);
+	xNowLabel->setString(xPosition);
+
+	yPosition += itoa((int)(-backgroundY + pea->getPositionY()), buffer, 10);
+	yNowLabel->setString(yPosition);
+	
+	
+	
 	if (isLeft)
 	{
-		if (backX < 0 && peaX <= winSize.width / 2)
+		position = position - Vec2(16, 0);
+		movable = IsWall(position);
+		if (movable == false)
+		{
+			return;
+		}
+
+		if (backgroundX < 0 && peaX <= winSize.width / 2)
 		{
 
-			backX += MAP_MOVE_SPEED;
+			backgroundX += MAP_MOVE_SPEED;
 			
 		}
 		else
 		{
-			if(backX > 0)
+			if(backgroundX>0)
 			{
-				backX = 0;
+				backgroundX = 0;
 			}
-			
-			peaX -= TAG_MOVE_SPEED;
+			peaX -=TAG_MOVE_SPEED;
+
 			if (peaX < 32)
 			{
 				peaX += TAG_MOVE_SPEED;
@@ -173,48 +218,60 @@ void HelloWorld::update(float fDelta)
 		}
 
 	}
-
+	
 	if (isRight)
 	{
-		if (backX > -(mapSize.width * 32 - winSize.width)  && peaX >= winSize.width / 2)
+		position = position + Vec2(16, 0);
+		movable = IsWall(position);
+		if (movable == false)
 		{
-			backX -= MAP_MOVE_SPEED;
+			return;
+		}
+
+		if (backgroundX > -(mapSize.width * 32 - winSize.width)  && peaX >= winSize.width / 2)
+		{
+			backgroundX -= MAP_MOVE_SPEED;
 		}
 		else
 		{
-			if(backX <= -(mapSize.width*32 - winSize.width))
+			if(backgroundX <= -(mapSize.width*32 - winSize.width))
 			{
-				backX = -(mapSize.width * 32 - winSize.width);
+				backgroundX = -(mapSize.width * 32 - winSize.width);
 			}
-			
 			peaX += TAG_MOVE_SPEED;
 
 			if (peaX > winSize.width - 32)
 			{
 				peaX -= TAG_MOVE_SPEED;
 			}
-			
+
 		}
 
 	}
-
+	
 	if (isDown)
 	{
-		if (backY <  0 && peaY <= winSize.height / 2)
+		position = position + Vec2(0, -16);
+		movable = IsWall(position);
+		if (movable == false)
 		{
-			backY += MAP_MOVE_SPEED;
+			return;
+		}
+		if (backgroundY <  0 && peaY <= winSize.height / 2)
+		{
+			backgroundY += MAP_MOVE_SPEED;
 		}
 		else
 		{
-			if(backY >= 0 )
+			if(backgroundY >= 0 )
 			{
-				backY = 0;
+				backgroundY = 0;
 			}
-
 			peaY -= TAG_MOVE_SPEED;
 			if (peaY < 32)
 			{
-				peaY += TAG_MOVE_SPEED;
+				peaY += TAG_MOVE_SPEED;;
+
 			}
 
 
@@ -223,21 +280,27 @@ void HelloWorld::update(float fDelta)
 
 	if(isUp)
 	{
-		if (backY > -(mapSize.height * 32 - winSize.height) && peaY >= winSize.height /2)
+		position = position + Vec2(0, 16);
+		movable = IsWall(position);
+		if (movable == false)
 		{
-			backY -= MAP_MOVE_SPEED;
+			return;
+		}
+
+		if (backgroundY > -(mapSize.height * 32 - winSize.height) && peaY >= winSize.height /2)
+		{
+			backgroundY -= MAP_MOVE_SPEED;
 		}
 		else
 		{
-			if(backY <= -(mapSize.height * 32 - winSize.height))
+			if(backgroundY <= -(mapSize.height * 32 - winSize.height))
 			{
-				backY = -(mapSize.height * 32 - winSize.height);
+				backgroundY = -(mapSize.height * 32 - winSize.height);
 			}
-
 			peaY += TAG_MOVE_SPEED;
 			if (peaY > winSize.height - 32)
 			{
-				peaY -= TAG_MOVE_SPEED;
+				peaY -= TAG_MOVE_SPEED;;
 			}
 
 
@@ -251,6 +314,13 @@ void HelloWorld::update(float fDelta)
 	
 	if (isLeft)
 	{
+		position = position - Vec2(5, 0);
+		movable = IsWall(position);
+		if (movable == false)
+		{
+			return;
+		}
+
 		if (backgroundX < 0 && pea->getPositionX() <= winSize.width / 2)
 		{
 
@@ -276,6 +346,13 @@ void HelloWorld::update(float fDelta)
 	
 	if (isRight)
 	{
+		position = position + Vec2(5, 0);
+		movable = IsWall(position);
+		if (movable == false)
+		{
+			return;
+		}
+
 		if (backgroundX > -(mapSize.width * 32 - winSize.width)  && pea->getPositionX() >= winSize.width / 2)
 		{
 			backgroundX -= MAP_MOVE_SPEED;
@@ -299,6 +376,12 @@ void HelloWorld::update(float fDelta)
 	
 	if (isDown)
 	{
+		position = position + Vec2(0, -5);
+		movable = IsWall(position);
+		if (movable == false)
+		{
+			return;
+		}
 		if (backgroundY <  0 && pea->getPositionY() <= winSize.height / 2)
 		{
 			backgroundY += MAP_MOVE_SPEED;
@@ -322,6 +405,13 @@ void HelloWorld::update(float fDelta)
 
 	if(isUp)
 	{
+		position = position + Vec2(0, 5);
+		movable = IsWall(position);
+		if (movable == false)
+		{
+			return;
+		}
+
 		if (backgroundY > -(mapSize.height * 32 - winSize.height) && pea->getPositionY() >= winSize.height /2)
 		{
 			backgroundY -= MAP_MOVE_SPEED;
@@ -343,19 +433,95 @@ void HelloWorld::update(float fDelta)
 		
 
 		
-	}*/
+	}
+	
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	*/
 
-	map->setPosition(Vec2(backX, backY));
+
+	
+	map->setPosition(Vec2(backgroundX, backgroundY));
 	pea->setPosition(Vec2(peaX, peaY));
 
+	xPosition = "";
+	xPosition += itoa((int)(-backgroundX + pea->getPositionX()), buffer , 10);
+	xNowLabel->setString(xPosition);
+	
+	yPosition = "";
+	yPosition += itoa((int)(-backgroundY + pea->getPositionY()), buffer, 10);
+	yNowLabel->setString(yPosition);	
+
+	
 
 }
 
 CCPoint HelloWorld::tileCoordForPosition(CCPoint position)
 {
 	int x = position.x / map->getTileSize().width;
-	int y = ((map->getMapSize().height * map->getTileSize().height) - position.y) / map->getTileSize().height;
+	int y = ((map->getMapSize().height*map->getTileSize().height) - position.y) / map->getTileSize().height;
 
 	return ccp(x, y);
 
 }
+
+bool HelloWorld::IsWall(CCPoint position)
+{
+	position -= Vec2(backgroundX,backgroundY);
+	CCPoint tileCoord = tileCoordForPosition(position);
+	unsigned int tileGid = background->tileGIDAt(tileCoord);
+	
+	if (tileGid == WALL)
+	{
+		auto properties = map->propertiesForGID(tileGid);
+
+		ValueMap vmap = properties.asValueMap();
+
+		String propertyValue = vmap["Collidable"].asString();
+		if (propertyValue.compare("True") == 0)
+		{
+			return false;
+		}
+	}
+	return true;
+
+
+}
+
+Vec2 HelloWorld::setCharacterPosition(Vec2 position, Vec2 moveVec)
+{
+	return position;
+}
+
+
+
+/*
+if (isRight)
+{
+	position = position + Vec2(5, 0);
+	movable = IsWall(position);
+	if (movable == false)
+	{
+		return;
+	}
+
+	if (backgroundX > -(mapSize.width * 32 - winSize.width) && peaX >= winSize.width / 2)
+	{
+		backgroundX -= MAP_MOVE_SPEED;
+	}
+	else
+	{
+		if (backgroundX <= -(mapSize.width * 32 - winSize.width))
+		{
+			backgroundX = -(mapSize.width * 32 - winSize.width);
+		}
+		peaX += TAG_MOVE_SPEED;
+
+		if (peaX > winSize.width - 32)
+		{
+			peaX -= TAG_MOVE_SPEED;
+		}
+
+	}
+
+}
+*/
