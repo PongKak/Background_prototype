@@ -37,9 +37,9 @@ bool HelloWorld::init()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 
-	map = CCTMXTiledMap::create("untitled.tmx");
-	background = map->layerNamed("Tile Layer 1");
-	CCTMXObjectGroup* objectGroup = map->getObjectGroup("Object Layer 1");
+	map = CCTMXTiledMap::create(TILEMAP_NAME);
+	background = map->layerNamed(MAP_TYLENAME);
+	CCTMXObjectGroup* objectGroup = map->getObjectGroup(MAP_OBJECTLAYER);
 	//metaInfo = map->layerNamed("MetaInfo");
 //	metaInfo->setVisible(false);
 	
@@ -51,11 +51,11 @@ bool HelloWorld::init()
 
 	
 
-	auto objectStart = objectGroup->getObject("Start");
+	auto objectStart = objectGroup->getObject(Start_Object);
 	
 
 	float x = objectStart["x"].asFloat();
-	float y = objectStart["y"].asFloat() +4;
+	float y = objectStart["y"].asFloat();
 
 	char pointX[]  = "X:";
 	char pointY[] = "Y:";
@@ -87,7 +87,7 @@ bool HelloWorld::init()
 
 
 
-	Sprite* sprite = Sprite::create("Pea.png");
+	Sprite* sprite = Sprite::create(CHARACTER_NAME);
 
 
 
@@ -95,6 +95,8 @@ bool HelloWorld::init()
 	sprite->setTag(0);
 	this->addChild(sprite);
 
+
+	Rect rectSpr = sprite->getBoundingBox();
 
 	isLeft = false;
 	isRight = false;
@@ -163,285 +165,178 @@ void HelloWorld::update(float fDelta)
 	Node* pea = this->getChildByTag(0);
 	Sprite* sprite = (Sprite*)this->getChildByTag(1);
 	Vec2 position = pea->getPosition();
-	bool movable = true;
+	Vec2 moveVec = Vec2(0,0);
+	bool movable = false;
 
 	std::string xPosition = "";
 	std::string yPosition = "";
 	char buffer[100];
 
-	float peaX = pea->getPosition().x;
-	float peaY = pea->getPosition().y;
-
-
-	
-	map->setPosition(Vec2(backgroundX, backgroundY));
-	pea->setPosition(Vec2(peaX, peaY));
-
-
-
-	xPosition += itoa((int)(-backgroundX + pea->getPositionX()), buffer, 10);
-	xNowLabel->setString(xPosition);
-
-	yPosition += itoa((int)(-backgroundY + pea->getPositionY()), buffer, 10);
-	yNowLabel->setString(yPosition);
-	
-	
 	
 	if (isLeft)
-	{
-		position = position - Vec2(16, 0);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-
-		if (backgroundX < 0 && peaX <= winSize.width / 2)
-		{
-
-			backgroundX += MAP_MOVE_SPEED;
-			
-		}
-		else
-		{
-			if(backgroundX>0)
-			{
-				backgroundX = 0;
-			}
-			peaX -=TAG_MOVE_SPEED;
-
-			if (peaX < 32)
-			{
-				peaX += TAG_MOVE_SPEED;
-			}
-
-		}
-
+	{		
+		moveVec.add(Vec2(-1, 0));
 	}
-	
-	if (isRight)
-	{
-		position = position + Vec2(16, 0);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-
-		if (backgroundX > -(mapSize.width * 32 - winSize.width)  && peaX >= winSize.width / 2)
-		{
-			backgroundX -= MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundX <= -(mapSize.width*32 - winSize.width))
-			{
-				backgroundX = -(mapSize.width * 32 - winSize.width);
-			}
-			peaX += TAG_MOVE_SPEED;
-
-			if (peaX > winSize.width - 32)
-			{
-				peaX -= TAG_MOVE_SPEED;
-			}
-
-		}
-
+	else if (isRight)
+	{	
+		moveVec.add(Vec2(1, 0));
 	}
 	
 	if (isDown)
 	{
-		position = position + Vec2(0, -16);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-		if (backgroundY <  0 && peaY <= winSize.height / 2)
-		{
-			backgroundY += MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundY >= 0 )
-			{
-				backgroundY = 0;
-			}
-			peaY -= TAG_MOVE_SPEED;
-			if (peaY < 32)
-			{
-				peaY += TAG_MOVE_SPEED;;
-
-			}
-
-
-		}
+		moveVec.add(Vec2(0, -1));
+	}
+	else if(isUp)
+	{
+		moveVec.add(Vec2(0, 1));
 	}
 
-	if(isUp)
+	movable = IsWall(position + moveVec * 16);
+
+	if (movable == true && moveVec != Vec2(0,0))
 	{
-		position = position + Vec2(0, 16);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-
-		if (backgroundY > -(mapSize.height * 32 - winSize.height) && peaY >= winSize.height /2)
-		{
-			backgroundY -= MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundY <= -(mapSize.height * 32 - winSize.height))
-			{
-				backgroundY = -(mapSize.height * 32 - winSize.height);
-			}
-			peaY += TAG_MOVE_SPEED;
-			if (peaY > winSize.height - 32)
-			{
-				peaY -= TAG_MOVE_SPEED;;
-			}
-
-
-		}
-		
-
-		
+		position = setCharacterPosition(position, moveVec);
 	}
 
 	/*
 	
+
 	if (isLeft)
 	{
-		position = position - Vec2(5, 0);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
+	position = position - Vec2(16, 0);
+	movable = IsWall(position);
+	if (movable == false)
+	{
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	pea->setPosition(Vec2(peaX, peaY));
 
-		if (backgroundX < 0 && pea->getPositionX() <= winSize.width / 2)
-		{
+	return;
+	}
 
-			backgroundX += MAP_MOVE_SPEED;
-			
-		}
-		else
-		{
-			if(backgroundX>0)
-			{
-				backgroundX = 0;
-			}
-			pea->setPosition(pea->getPosition() + Vec2(-TAG_MOVE_SPEED, 0));
+	if (backgroundX < 0 && peaX <= winSize.width / 2)
+	{
 
-			if (pea->getPositionX() < 32)
-			{
-				pea->setPosition(pea->getPosition() + Vec2(TAG_MOVE_SPEED, 0));
-			}
-
-		}
+	backgroundX += MAP_MOVE_SPEED;
 
 	}
-	
+	else
+	{
+	if(backgroundX>0)
+	{
+	backgroundX = 0;
+	}
+	peaX -=TAG_MOVE_SPEED;
+
+	if (peaX < 32)
+	{
+	peaX += TAG_MOVE_SPEED;
+	}
+
+	}
+
+	}
+
 	if (isRight)
 	{
-		position = position + Vec2(5, 0);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
+	position = position + Vec2(16, 0);
+	movable = IsWall(position);
+	if (movable == false)
+	{
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	pea->setPosition(Vec2(peaX, peaY));
+	return;
+	}
 
-		if (backgroundX > -(mapSize.width * 32 - winSize.width)  && pea->getPositionX() >= winSize.width / 2)
-		{
-			backgroundX -= MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundX <= -(mapSize.width*32 - winSize.width))
-			{
-				backgroundX = -(mapSize.width * 32 - winSize.width);
-			}
-			pea->setPosition(pea->getPosition() + Vec2(TAG_MOVE_SPEED, 0));
+	if (backgroundX > -(mapSize.width * 32 - winSize.width)  && peaX >= winSize.width / 2)
+	{
+	backgroundX -= MAP_MOVE_SPEED;
+	}
+	else
+	{
+	if(backgroundX <= -(mapSize.width*32 - winSize.width))
+	{
+	backgroundX = -(mapSize.width * 32 - winSize.width);
+	}
+	peaX += TAG_MOVE_SPEED;
 
-			if (pea->getPositionX() > winSize.width - 32)
-			{
-				pea->setPosition(pea->getPosition() + Vec2(-TAG_MOVE_SPEED, 0));
-			}
-
-		}
+	if (peaX > winSize.width - 32)
+	{
+	peaX -= TAG_MOVE_SPEED;
+	}
 
 	}
-	
+
+	}
+
 	if (isDown)
 	{
-		position = position + Vec2(0, -5);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-		if (backgroundY <  0 && pea->getPositionY() <= winSize.height / 2)
-		{
-			backgroundY += MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundY >= 0 )
-			{
-				backgroundY = 0;
-			}
-			pea->setPosition(pea->getPosition() + Vec2(0, -TAG_MOVE_SPEED));
-			if (pea->getPositionY() < 32)
-			{
-				pea->setPosition(pea->getPosition() + Vec2(0, +TAG_MOVE_SPEED));
+	position = position + Vec2(0, -16);
+	movable = IsWall(position);
+	if (movable == false)
+	{
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	pea->setPosition(Vec2(peaX, peaY));
+	return;
+	}
+	if (backgroundY <  0 && peaY <= winSize.height / 2)
+	{
+	backgroundY += MAP_MOVE_SPEED;
+	}
+	else
+	{
+	if(backgroundY >= 0 )
+	{
+	backgroundY = 0;
+	}
+	peaY -= TAG_MOVE_SPEED;
+	if (peaY < 32)
+	{
+	peaY += TAG_MOVE_SPEED;;
 
-			}
+	}
 
 
-		}
+	}
 	}
 
 	if(isUp)
 	{
-		position = position + Vec2(0, 5);
-		movable = IsWall(position);
-		if (movable == false)
-		{
-			return;
-		}
-
-		if (backgroundY > -(mapSize.height * 32 - winSize.height) && pea->getPositionY() >= winSize.height /2)
-		{
-			backgroundY -= MAP_MOVE_SPEED;
-		}
-		else
-		{
-			if(backgroundY <= -(mapSize.height * 32 - winSize.height))
-			{
-				backgroundY = -(mapSize.height * 32 - winSize.height);
-			}
-			pea->setPosition(pea->getPosition() + Vec2(0, +TAG_MOVE_SPEED));
-			if (pea->getPositionY() > winSize.height - 32)
-			{
-				pea->setPosition(pea->getPosition() + Vec2(0, -TAG_MOVE_SPEED));
-			}
-
-
-		}
-		
-
-		
-	}
-	
-	map->setPosition(Vec2(backgroundX, backgroundY));
-	*/
-
-
-	
+	position = position + Vec2(0, 16);
+	movable = IsWall(position);
+	if (movable == false)
+	{
 	map->setPosition(Vec2(backgroundX, backgroundY));
 	pea->setPosition(Vec2(peaX, peaY));
+	return;
+	}
+
+	if (backgroundY > -(mapSize.height * 32 - winSize.height) && peaY >= winSize.height /2)
+	{
+	backgroundY -= MAP_MOVE_SPEED;
+	}
+	else
+	{
+	if(backgroundY <= -(mapSize.height * 32 - winSize.height))
+	{
+	backgroundY = -(mapSize.height * 32 - winSize.height);
+	}
+	peaY += TAG_MOVE_SPEED;
+	if (peaY > winSize.height - 32)
+	{
+	peaY -= TAG_MOVE_SPEED;;
+	}
+
+
+	}
+
+
+
+	}
+	*/
+
+	
+	map->setPosition(Vec2(backgroundX, backgroundY));
+	pea->setPosition(position);
 
 	xPosition = "";
 	xPosition += itoa((int)(-backgroundX + pea->getPositionX()), buffer , 10);
@@ -476,7 +371,7 @@ bool HelloWorld::IsWall(CCPoint position)
 
 		ValueMap vmap = properties.asValueMap();
 
-		String propertyValue = vmap["Collidable"].asString();
+		String propertyValue = vmap[COLLIDABLE].asString();
 		if (propertyValue.compare("True") == 0)
 		{
 			return false;
@@ -489,39 +384,209 @@ bool HelloWorld::IsWall(CCPoint position)
 
 Vec2 HelloWorld::setCharacterPosition(Vec2 position, Vec2 moveVec)
 {
-	return position;
+	bool backMoveX = false;
+	bool backMoveY = false;
+	
+	if (moveVec.x < 0)
+	{
+		if (backgroundX < 0 && position.x <= winSize.width / 2)
+		{
+			backgroundX += MAP_MOVE_SPEED;
+			backMoveX = true;
+		}
+		else
+		{
+			if (backgroundX > 0)
+			{
+				backgroundX = 0;
+			}
+			moveVec.add(Vec2(-TAG_MOVE_SPEED, 0));
+			if (position.x - TAG_MOVE_SPEED < 32)
+			{
+				moveVec.x = 0;
+			}
+		}
+
+	}
+	else if (moveVec.x > 0)
+	{
+		if (backgroundX > -(mapSize.width * 32 - winSize.width) && position.x >= winSize.width / 2)
+		{
+			backgroundX -= MAP_MOVE_SPEED;
+			backMoveX = true;
+		}
+		else
+		{
+			if (backgroundX <= -(mapSize.width * 32 - winSize.width))
+			{
+				backgroundX = -(mapSize.width * 32 - winSize.width);
+			}
+			moveVec.add(Vec2(TAG_MOVE_SPEED, 0));
+			if (position.x+ TAG_MOVE_SPEED > winSize.width - 32)
+			{
+				moveVec.x = 0;
+			}
+		}
+	}
+
+	if (moveVec.y < 0)
+	{
+		if (backgroundY < 0 && position.y <= winSize.height / 2)
+		{
+			backgroundY += MAP_MOVE_SPEED;
+			backMoveY = true;
+		}
+		else
+		{
+			if (backgroundY >= 0)
+			{
+				backgroundY = 0;
+			}
+			moveVec.add(Vec2(0,-TAG_MOVE_SPEED));
+			if (position.y - TAG_MOVE_SPEED < 32)
+			{
+				moveVec.y = 0;
+			}
+		}
+	}
+	else if(moveVec.y > 0)
+	{
+		if (backgroundY > -(mapSize.height * 32 - winSize.height) && position.y >= winSize.height / 2)
+		{
+			backgroundY -= MAP_MOVE_SPEED;
+			backMoveY = true;
+		}
+		else
+		{
+			if (backgroundY <= -(mapSize.height * 32 - winSize.height))
+			{
+				backgroundY = -(mapSize.height * 32 - winSize.height);
+			}
+			moveVec.add(Vec2(0, TAG_MOVE_SPEED));
+			if (position.y + TAG_MOVE_SPEED > winSize.height - 32)
+			{
+				moveVec.y=0;
+			}
+		}
+	}
+	/*
+	if (moveVec.x < 0)
+	{
+		if (backgroundMove() && position.x <= winSize.width / 2)
+		{
+			backgroundX += MAP_MOVE_SPEED;
+			backMoveX = true;
+			if (backgroundX > 0)
+			{
+				backgroundX = 0;
+
+
+			}
+		}
+		else
+		{
+			
+			moveVec.add(Vec2(-TAG_MOVE_SPEED, 0));
+			if (position.x - TAG_MOVE_SPEED < 32)
+			{
+				moveVec.x = 0;
+			}
+		}
+
+	}
+	else if (moveVec.x > 0)
+	{
+		if (backgroundMove() && position.x >= winSize.width / 2)
+		{
+			backgroundX -= MAP_MOVE_SPEED;
+			backMoveX = true;
+			if (backgroundX <= -(mapSize.width * 32 - winSize.width))
+			{
+				backgroundX = -(mapSize.width * 32 - winSize.width);
+	
+			}
+		}
+		else
+		{
+			
+			moveVec.add(Vec2(TAG_MOVE_SPEED, 0));
+			if (position.x+ TAG_MOVE_SPEED > winSize.width - 32)
+			{
+				moveVec.x = 0;
+			}
+		}
+	}
+
+	if (moveVec.y < 0)
+	{
+		if (backgroundMove() && position.y <= winSize.height / 2)
+		{
+			backgroundY += MAP_MOVE_SPEED;
+			backMoveY = true;
+
+			if (backgroundY >= 0)
+			{
+				backgroundY = 0;
+			}
+		}
+		else
+		{
+			moveVec.add(Vec2(0,-TAG_MOVE_SPEED));
+			if (position.y - TAG_MOVE_SPEED < 32)
+			{
+				moveVec.y = 0;
+			}
+		}
+	}
+	else if(moveVec.y > 0)
+	{
+		if (backgroundMove() && position.y >= winSize.height / 2)
+		{
+			backgroundY -= MAP_MOVE_SPEED;
+			backMoveY = true;
+
+			if (backgroundY <= -(mapSize.height * 32 - winSize.height))
+			{
+				backgroundY = -(mapSize.height * 32 - winSize.height);
+	
+			}
+		}
+		else
+		{
+			moveVec.add(Vec2(0, TAG_MOVE_SPEED));
+			if (position.y + TAG_MOVE_SPEED > winSize.height - 32)
+			{
+				moveVec.y=0;
+			}
+		}
+	}*/
+
+
+
+	if (backMoveX && backMoveY )
+	{
+		return position;
+	}
+	return position + moveVec;
 }
 
-
-
-/*
-if (isRight)
+bool HelloWorld::backgroundMove()
 {
-	position = position + Vec2(5, 0);
-	movable = IsWall(position);
-	if (movable == false)
+	if ((backgroundX <= 0 &&	backgroundX  >= -(mapSize.width * 32 - winSize.width)) &&
+		(backgroundY <= 0 &&	backgroundY  >= -(mapSize.height * 32 - winSize.height))
+		)
 	{
-		return;
+		return true;
 	}
-
-	if (backgroundX > -(mapSize.width * 32 - winSize.width) && peaX >= winSize.width / 2)
-	{
-		backgroundX -= MAP_MOVE_SPEED;
-	}
-	else
-	{
-		if (backgroundX <= -(mapSize.width * 32 - winSize.width))
-		{
-			backgroundX = -(mapSize.width * 32 - winSize.width);
-		}
-		peaX += TAG_MOVE_SPEED;
-
-		if (peaX > winSize.width - 32)
-		{
-			peaX -= TAG_MOVE_SPEED;
-		}
-
-	}
+	return false;
 
 }
-*/
+bool HelloWorld::characterMove(Vec2 position)
+{
+	if (position.x != winSize.width / 2 ||
+		position.y != winSize.height / 2)
+	{
+		return true;
+	}
+	return false;
+}
